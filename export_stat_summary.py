@@ -15,8 +15,6 @@ def get_data(file, result):
 
     for x in range(1, total):
         name = sheet.cell_value(x, 1)
-        if name == '陈晨(研发事业一部)':
-            name = '陈晨'
         name = name.replace("t_", "")
         working_month = sheet.cell_value(x, 3)
         project_name = sheet.cell_value(x, 2)
@@ -33,7 +31,7 @@ if __name__ == '__main__':
     print("start")
     result = {}
 
-    get_data('C:/Users/user/Desktop/6-7.工作量-统计人员在项目的工时（1-9）20221117）.xlsx', result)
+    get_data('C:/Users/user/Desktop/20221117）.xlsx', result)
     #get_data('C:/Users/user/Desktop/4/6-7.工作量-统计人员在项目的工时2-9.xlsx', result)
 
     # for key in result.keys():
@@ -42,7 +40,7 @@ if __name__ == '__main__':
 
 
 
-    facebook = xlrd.open_workbook('C:/Users/user/Desktop/成都分公司在岗人员总人月数及报工统计（1-9月）20221116.xlsx')
+    facebook = xlrd.open_workbook('C:/Users/user/Desktop/20221116.xlsx')
     facebook_sheet = facebook.sheet_by_index(0)
     n=0
     outputbook = xlwt.Workbook()
