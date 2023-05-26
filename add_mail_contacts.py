@@ -25,10 +25,10 @@ def get_contacts(url, sid, cookies) -> {}:
     for var in body['var']:
         for department in var['ou']:
             if "ou" not in department.keys():
-                get_department(url, sid, cookie_dic, department['id'], department['name'], contacts)
+                get_department(url, sid, cookie_dic, department['id'], "", department['name'], contacts)
             else:
                 for sub_depart in department['ou']:
-                    get_department(url, sid, cookie_dic, sub_depart['id'], sub_depart['name'], contacts)
+                    get_department(url, sid, cookie_dic, sub_depart['id'], department['name']+"/", sub_depart['name'], contacts)
 
     return contacts
 
@@ -42,7 +42,10 @@ def get_cookies(cookies) -> {}:
     return cookie_dic
 
 
-def get_department(url, sid, cookie_dic, department_id, department_name, contacts):
+def get_department(url, sid, cookie_dic, department_id, department_prefix, department_name, contacts):
+    if department_id == 'ggyx':
+        return
+
     data = {
         "start": 0,
         "limit": 200,
@@ -68,7 +71,7 @@ def get_department(url, sid, cookie_dic, department_id, department_name, contact
     for var in body['var']:
         contact = Contact()
         contact.Name = var['true_name']
-        contact.Department = department_name
+        contact.Department = department_prefix + department_name
         contact.Mail = var['email']
         if contact.Mail in contacts.keys():
             continue
@@ -87,7 +90,9 @@ def add_outlook_contact(contacts):
     for item in contactsFolder.Items:
         if hasattr(item, "Email1Address"):
             existed_mails[item.Email1Address] = "1"
-
+            if item.Email1Address in contacts:
+                item.Department=contacts[item.Email1Address].Department
+                item.save()
     for contact_mail in contacts:
         contact = contacts[contact_mail]
         if contact.Name == '' or contact.Mail == '':
@@ -114,11 +119,13 @@ def export_foxmail_contact(contacts, csv_file):
 
 if __name__ == '__main__':
     print("abc")
-    contacts = get_contacts('https://mail.****.cn/coremail/s/json', # replace the star characters with correct domain name
-                            '', # find the sid via F12 Chrome Developer tools
-                            ''  # find the cookie strings via F12 Chrome Developer tools
-                            )
-    is_outlook = False
+    f = open("mail_config.json")
+    config = json.load(f)
+    contacts = get_contacts(config['url'],
+                            # replace the star characters with correct domain name
+                            config['sid'],  # find the sid via F12 Chrome Developer tools
+                            config['cookie'])
+    is_outlook = True
     if is_outlook:
         add_outlook_contact(contacts)
     else:
