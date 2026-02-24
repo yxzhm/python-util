@@ -129,3 +129,4 @@ dmypy.json
 .pyre/
 .idea/
 mail_config.json
+/mail-contacts/
